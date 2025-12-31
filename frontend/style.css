@@ -131,6 +131,32 @@ header h1 {
     margin-bottom: 0;
 }
 
+/* New Chat Button - styled like sidebar headers */
+.new-chat-button {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    text-align: left;
+    transition: color 0.2s ease;
+    outline: none;
+    display: block;
+}
+
+.new-chat-button:hover {
+    color: var(--primary-color);
+}
+
+.new-chat-button:focus {
+    outline: none;
+    color: var(--primary-color);
+}
+
 /* Main Chat Area */
 .chat-main {
     flex: 1;
@@ -261,8 +287,40 @@ header h1 {
 }
 
 .sources-content {
-    padding: 0 0.5rem 0.25rem 1.5rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.sources-content a {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-radius: 16px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.sources-content a:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.sources-content .source-tag {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    background: var(--surface);
     color: var(--text-secondary);
+    border-radius: 16px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-color);
 }
 
 /* Markdown formatting styles */

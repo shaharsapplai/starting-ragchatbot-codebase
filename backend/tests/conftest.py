@@ -105,10 +105,17 @@ def search_tool(loaded_vector_store):
 
 
 @pytest.fixture
-def tool_manager(search_tool):
+def outline_tool(loaded_vector_store):
+    """Create CourseOutlineTool with loaded VectorStore"""
+    return CourseOutlineTool(loaded_vector_store)
+
+
+@pytest.fixture
+def tool_manager(search_tool, outline_tool):
     """Create ToolManager with registered tools"""
     manager = ToolManager()
     manager.register_tool(search_tool)
+    manager.register_tool(outline_tool)
     return manager
 
 
