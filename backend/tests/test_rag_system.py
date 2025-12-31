@@ -3,11 +3,13 @@ Tests for RAGSystem query flow.
 
 Integration tests using real VectorStore with mocked Anthropic API.
 """
-import pytest
+
 import os
 import sys
-from unittest.mock import Mock, patch, MagicMock
 from dataclasses import dataclass
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 # Add backend to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -27,7 +29,9 @@ def create_mock_text_response(text: str):
     return mock_response
 
 
-def create_mock_tool_use_response(tool_name: str, tool_input: dict, tool_id: str = "tool_123"):
+def create_mock_tool_use_response(
+    tool_name: str, tool_input: dict, tool_id: str = "tool_123"
+):
     """Helper to create a mock tool_use response"""
     mock_response = Mock()
     mock_response.stop_reason = "tool_use"
@@ -45,19 +49,19 @@ class TestRAGSystemInitialization:
 
     def test_tool_manager_has_search_tool_registered(self, test_config):
         """RAGSystem registers CourseSearchTool"""
-        with patch('rag_system.AIGenerator'):
+        with patch("rag_system.AIGenerator"):
             rag = RAGSystem(test_config)
             assert "search_course_content" in rag.tool_manager.tools
 
     def test_tool_manager_has_outline_tool_registered(self, test_config):
         """RAGSystem registers CourseOutlineTool"""
-        with patch('rag_system.AIGenerator'):
+        with patch("rag_system.AIGenerator"):
             rag = RAGSystem(test_config)
             assert "get_course_outline" in rag.tool_manager.tools
 
     def test_session_manager_initialized(self, test_config):
         """RAGSystem initializes SessionManager"""
-        with patch('rag_system.AIGenerator'):
+        with patch("rag_system.AIGenerator"):
             rag = RAGSystem(test_config)
             assert rag.session_manager is not None
 
@@ -68,7 +72,7 @@ class TestRAGSystemQuery:
     @pytest.fixture
     def rag_system_with_mocked_ai(self, test_config, loaded_vector_store):
         """Create RAGSystem with real VectorStore but mocked AI"""
-        with patch('rag_system.AIGenerator') as MockAI:
+        with patch("rag_system.AIGenerator") as MockAI:
             mock_generator = Mock()
             MockAI.return_value = mock_generator
 
@@ -183,7 +187,7 @@ class TestRAGSystemWithRealFlow:
     def rag_with_real_tools(self, test_config, loaded_vector_store):
         """RAGSystem with real tools but mocked AI client"""
         # Patch only the Anthropic client, not the whole AIGenerator
-        with patch('anthropic.Anthropic') as MockClient:
+        with patch("anthropic.Anthropic") as MockClient:
             mock_client = Mock()
             MockClient.return_value = mock_client
 
@@ -201,10 +205,11 @@ class TestRAGSystemWithRealFlow:
         # Mock API responses: first tool_use, then final response
         mock_client.messages.create.side_effect = [
             create_mock_tool_use_response(
-                tool_name="search_course_content",
-                tool_input={"query": "computer use"}
+                tool_name="search_course_content", tool_input={"query": "computer use"}
             ),
-            create_mock_text_response("Based on the search results, computer use is...")
+            create_mock_text_response(
+                "Based on the search results, computer use is..."
+            ),
         ]
 
         response, sources = rag.query("Tell me about computer use")
@@ -236,7 +241,7 @@ class TestRAGSystemAnalytics:
 
     def test_get_course_analytics_returns_dict(self, test_config, loaded_vector_store):
         """get_course_analytics returns analytics dict"""
-        with patch('rag_system.AIGenerator'):
+        with patch("rag_system.AIGenerator"):
             rag = RAGSystem(test_config)
             rag.vector_store = loaded_vector_store
 
@@ -246,9 +251,11 @@ class TestRAGSystemAnalytics:
             assert "total_courses" in analytics
             assert "course_titles" in analytics
 
-    def test_get_course_analytics_reflects_loaded_courses(self, test_config, loaded_vector_store):
+    def test_get_course_analytics_reflects_loaded_courses(
+        self, test_config, loaded_vector_store
+    ):
         """Analytics reflects actually loaded courses"""
-        with patch('rag_system.AIGenerator'):
+        with patch("rag_system.AIGenerator"):
             rag = RAGSystem(test_config)
             rag.vector_store = loaded_vector_store
 

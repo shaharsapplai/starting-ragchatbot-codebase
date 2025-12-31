@@ -9,27 +9,30 @@ Includes fixtures for:
 - Integration tests (RAGSystem with mocked AI)
 - API tests (FastAPI test client with mocked dependencies)
 """
+
 import os
-import sys
 import shutil
-import pytest
+import sys
 from dataclasses import dataclass
-from unittest.mock import Mock, MagicMock, patch
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 # Add backend to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from vector_store import VectorStore, SearchResults
-from document_processor import DocumentProcessor
-from search_tools import CourseSearchTool, ToolManager
 from ai_generator import AIGenerator
-from models import Course, Lesson, CourseChunk
-
+from document_processor import DocumentProcessor
+from models import Course, CourseChunk, Lesson
+from search_tools import CourseOutlineTool, CourseSearchTool, ToolManager
+from vector_store import SearchResults, VectorStore
 
 # Test configuration
 TEST_CHROMA_PATH = os.path.join(os.path.dirname(__file__), "test_chroma_db")
-DOCS_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "docs")
+DOCS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "docs"
+)
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 100
@@ -39,6 +42,7 @@ MAX_RESULTS = 5
 @dataclass
 class TestConfig:
     """Test configuration matching the real config structure"""
+
     ANTHROPIC_API_KEY: str = "test-api-key"
     ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
     EMBEDDING_MODEL: str = EMBEDDING_MODEL
@@ -69,7 +73,7 @@ def loaded_vector_store(test_config):
     store = VectorStore(
         chroma_path=TEST_CHROMA_PATH,
         embedding_model=EMBEDDING_MODEL,
-        max_results=MAX_RESULTS
+        max_results=MAX_RESULTS,
     )
 
     # Process and load documents
@@ -77,7 +81,7 @@ def loaded_vector_store(test_config):
 
     if os.path.exists(DOCS_PATH):
         for filename in os.listdir(DOCS_PATH):
-            if filename.endswith('.txt'):
+            if filename.endswith(".txt"):
                 filepath = os.path.join(DOCS_PATH, filename)
                 try:
                     course, chunks = processor.process_course_document(filepath)
@@ -127,7 +131,9 @@ def create_mock_text_response(text: str):
     return mock_response
 
 
-def create_mock_tool_use_response(tool_name: str, tool_input: Dict[str, Any], tool_id: str = "tool_123"):
+def create_mock_tool_use_response(
+    tool_name: str, tool_input: Dict[str, Any], tool_id: str = "tool_123"
+):
     """Helper to create a mock tool_use response"""
     mock_response = Mock()
     mock_response.stop_reason = "tool_use"
@@ -158,8 +164,7 @@ def mock_tool_use_response():
 def mock_ai_generator(mock_anthropic_client, test_config):
     """Create AIGenerator with mocked client"""
     generator = AIGenerator(
-        api_key=test_config.ANTHROPIC_API_KEY,
-        model=test_config.ANTHROPIC_MODEL
+        api_key=test_config.ANTHROPIC_API_KEY, model=test_config.ANTHROPIC_MODEL
     )
     generator.client = mock_anthropic_client
     return generator
