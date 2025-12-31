@@ -4,6 +4,7 @@ Tests for CourseSearchTool and CourseOutlineTool.
 Uses real VectorStore with loaded course documents to test
 the execute() method and result formatting.
 """
+
 import pytest
 
 
@@ -23,8 +24,7 @@ class TestCourseSearchToolExecute:
     def test_execute_returns_error_for_nonexistent_course(self, search_tool):
         """Search with non-existent course filter returns error message"""
         result = search_tool.execute(
-            query="introduction",
-            course_name="NonExistentCourse12345"
+            query="introduction", course_name="NonExistentCourse12345"
         )
 
         # Should return error about course not found
@@ -37,10 +37,7 @@ class TestCourseSearchToolExecute:
 
         # Use first available course
         course_name = loaded_course_titles[0]
-        result = search_tool.execute(
-            query="lesson",
-            course_name=course_name
-        )
+        result = search_tool.execute(query="lesson", course_name=course_name)
 
         # Should return results (not an error)
         assert result is not None
@@ -53,8 +50,7 @@ class TestCourseSearchToolExecute:
             pytest.skip("No courses loaded")
 
         result = search_tool.execute(
-            query="introduction",
-            lesson_number=0  # Lesson 0 is usually the intro
+            query="introduction", lesson_number=0  # Lesson 0 is usually the intro
         )
 
         # Should return results
@@ -63,9 +59,7 @@ class TestCourseSearchToolExecute:
 
     def test_execute_handles_empty_results(self, search_tool):
         """Search with very specific non-matching query handles empty results"""
-        result = search_tool.execute(
-            query="xyzzy12345nonexistentterm67890abcdef"
-        )
+        result = search_tool.execute(query="xyzzy12345nonexistentterm67890abcdef")
 
         # Should handle gracefully (either empty message or no crash)
         assert result is not None
@@ -97,7 +91,9 @@ class TestCourseSearchToolExecute:
 class TestCourseOutlineToolExecute:
     """Test CourseOutlineTool.execute() method"""
 
-    def test_execute_returns_outline_for_valid_course(self, outline_tool, loaded_course_titles):
+    def test_execute_returns_outline_for_valid_course(
+        self, outline_tool, loaded_course_titles
+    ):
         """Get outline for existing course returns lesson list"""
         if not loaded_course_titles:
             pytest.skip("No courses loaded")
@@ -151,10 +147,7 @@ class TestToolManager:
 
     def test_execute_tool_calls_correct_tool(self, tool_manager):
         """execute_tool routes to the correct tool"""
-        result = tool_manager.execute_tool(
-            "search_course_content",
-            query="test query"
-        )
+        result = tool_manager.execute_tool("search_course_content", query="test query")
 
         # Should return a string result
         assert isinstance(result, str)
@@ -168,10 +161,7 @@ class TestToolManager:
     def test_get_last_sources_returns_sources(self, tool_manager):
         """get_last_sources returns sources from search tool"""
         # Execute a search first
-        tool_manager.execute_tool(
-            "search_course_content",
-            query="computer use"
-        )
+        tool_manager.execute_tool("search_course_content", query="computer use")
 
         sources = tool_manager.get_last_sources()
         assert isinstance(sources, list)
@@ -179,10 +169,7 @@ class TestToolManager:
     def test_reset_sources_clears_sources(self, tool_manager):
         """reset_sources clears sources from all tools"""
         # Execute a search first
-        tool_manager.execute_tool(
-            "search_course_content",
-            query="computer use"
-        )
+        tool_manager.execute_tool("search_course_content", query="computer use")
 
         # Reset
         tool_manager.reset_sources()
